@@ -1,4 +1,16 @@
+# Buiuld
+build/
+
+# Vscode
+.vscode/
+
+#IDEA
+.idea/
+
+# Node
 node_modules/
 .env
+
+# Other
 .DS_Store
 *.log
