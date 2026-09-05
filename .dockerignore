@@ -1,0 +1,9 @@
+node_modules/
+coverage/
+build/
+.git/
+.github/
+docs/
+tests/
+*.log
+.env

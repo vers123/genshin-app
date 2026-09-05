@@ -1,0 +1,19 @@
+# Build
+build/
+
+# Editor
+.vscode/
+.idea/
+
+# Node
+node_modules/
+.env
+
+# OS
+.DS_Store
+
+# Logs
+*.log
+
+# Coverage
+coverage/
