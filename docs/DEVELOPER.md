@@ -24,13 +24,13 @@
 ### 架构设计
 
 ```
-浏览器 (index.html + app.js + style.css)
+浏览器 (index.html + search.html + database.html)
     │  fetch XHR
     ▼
 Express Server (server.js)
     ├── middleware/logger.js        ← 请求日志
     ├── middleware/errorHandler.js  ← 错误处理
-    ├── static public/              ← 静态资源
+    ├── static public/              ← 静态资源（首页/搜索/百科）
     └── /api/*  routes/api.js
               │
               ▼
@@ -45,34 +45,38 @@ Express Server (server.js)
 | 层 | 文件 | 职责 |
 |---|---|---|
 | 入口 | `server.js` | Express 实例化、中间件挂载、路由挂载、端口监听 |
-| 配置 | `config/index.js` | 环境变量加载、数据分类列表定义 |
+| 配置 | `config/index.js` | 环境变量加载、数据分类列表、分页配置 |
 | 中间件 | `middleware/logger.js` | 请求日志记录 |
 | 中间件 | `middleware/errorHandler.js` | 统一错误处理和 404 |
 | 路由 | `routes/api.js` | API 端点定义、参数校验 |
-| 服务 | `services/genshinService.js` | 封装 genshin-db 查询逻辑 |
-| 前端 | `public/` | 静态页面、样式、交互逻辑 |
+| 服务 | `services/genshinService.js` | 封装 genshin-db 查询逻辑（搜索、分页浏览、详情） |
+| 前端 | `public/` | 首页导航、搜索页、数据库百科页、样式、交互逻辑 |
 
 ### 项目结构
 
 ```
 genshin-app/
 ├── config/
-│   └── index.js              # 配置加载器
+│   └── index.js              # 配置加载器（端口/语言/分页/分类）
 ├── docs/
 │   └── DEVELOPER.md          # 本文档
 ├── middleware/
 │   ├── logger.js             # 请求日志
 │   └── errorHandler.js       # 错误处理
 ├── public/
-│   ├── index.html            # 单页应用
+│   ├── index.html            # 首页导航入口
+│   ├── search.html           # 搜索页（精确/综合搜索）
+│   ├── database.html         # 数据库百科页（卡片浏览+详情）
 │   ├── css/
-│   │   └── style.css         # 暗色主题样式
+│   │   ├── style.css         # 搜索页暗色主题样式
+│   │   └── database.css      # 数据库百科原神官网风格样式
 │   └── js/
-│       └── app.js            # 前端交互逻辑
+│       ├── app.js            # 搜索页前端逻辑
+│       └── database.js      # 数据库百科前端逻辑（路由/卡片/详情）
 ├── routes/
-│   └── api.js                # API 路由
+│   └── api.js                # API 路由（search/category/item/count/list/folders）
 ├── services/
-│   └── genshinService.js     # 数据服务层
+│   └── genshinService.js     # 数据服务层（搜索/分页/详情/摘要提取）
 ├── tests/
 │   ├── api.test.js           # API 集成测试
 │   └── service.test.js       # 服务层单元测试
@@ -177,6 +181,49 @@ genshin-app/
 }
 ```
 
+#### `GET /api/category/:folder`
+
+分页获取指定分类下的物品摘要列表（用于数据库百科卡片网格展示）。
+
+**参数：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `folder` | string | 是 | 数据分类名（路径参数） |
+| `page` | number | 否 | 页码，默认取 `DEFAULT_PAGE` 配置值 |
+| `pageSize` | number | 否 | 每页条数，默认取 `DEFAULT_PAGE_SIZE` 配置值 |
+| `resultLanguage` | string | 否 | 结果语言 |
+
+**响应：**
+
+```json
+{
+  "folder": "characters",
+  "page": 1,
+  "pageSize": 24,
+  "total": 120,
+  "totalPages": 5,
+  "items": [
+    { "name": "安柏", "rarity": 4, "elementText": "火", "images": { ... } },
+    ...
+  ]
+}
+```
+
+#### `GET /api/item/:folder/:name`
+
+获取单个物品的完整详情数据（用于数据库百科详情面板展示）。
+
+**参数：**
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `folder` | string | 是 | 数据分类名（路径参数） |
+| `name` | string | 是 | 物品名称（路径参数） |
+| `resultLanguage` | string | 否 | 结果语言 |
+
+**响应：** 返回 genshin-db 完整数据对象，包含 name、id、description、images、costs、stats 等全部字段。
+
 ### 配置说明
 
 #### 环境变量
@@ -186,6 +233,8 @@ genshin-app/
 | `PORT` | number | `3000` | 服务监听端口 |
 | `RESULT_LANGUAGE` | string | `ChineseSimplified` | 默认结果输出语言 |
 | `QUERY_LANGUAGES` | string (逗号分隔) | `ChineseSimplified,English,Japanese,Korean` | 查询输入语言列表 |
+| `DEFAULT_PAGE` | number | `1` | 数据库百科默认起始页码 |
+| `DEFAULT_PAGE_SIZE` | number | `24` | 数据库百科每页条数 |
 
 #### 支持的语言
 
@@ -308,13 +357,13 @@ npm start
 ### Architecture
 
 ```
-Browser (index.html + app.js + style.css)
+Browser (index.html + search.html + database.html)
     │  fetch XHR
     ▼
 Express Server (server.js)
     ├── middleware/logger.js        ← request logging
     ├── middleware/errorHandler.js  ← error handling
-    ├── static public/              ← static assets
+    ├── static public/              ← static assets (home/search/database)
     └── /api/*  routes/api.js
               │
               ▼
@@ -329,34 +378,38 @@ Layer responsibilities:
 | Layer | File | Responsibility |
 |---|---|---|
 | Entry | `server.js` | Express instantiation, middleware mounting, route mounting, port listening |
-| Config | `config/index.js` | Environment variable loading, data category list definition |
+| Config | `config/index.js` | Environment variable loading, data category list, pagination config |
 | Middleware | `middleware/logger.js` | Request logging |
 | Middleware | `middleware/errorHandler.js` | Error handling and 404 |
 | Routes | `routes/api.js` | API endpoint definitions, parameter validation |
-| Service | `services/genshinService.js` | Wraps genshin-db query logic |
-| Frontend | `public/` | Static pages, styles, interaction logic |
+| Service | `services/genshinService.js` | Wraps genshin-db query logic (search, pagination, detail) |
+| Frontend | `public/` | Home navigation, search page, database browser, styles, interaction logic |
 
 ### Project Structure
 
 ```
 genshin-app/
 ├── config/
-│   └── index.js              # Config loader
+│   └── index.js              # Config loader (port/lang/pagination/categories)
 ├── docs/
 │   └── DEVELOPER.md          # This document
 ├── middleware/
 │   ├── logger.js             # Request logger
 │   └── errorHandler.js       # Error handler
 ├── public/
-│   ├── index.html            # Single-page app
+│   ├── index.html            # Home navigation entry
+│   ├── search.html           # Search page (precise/aggregated)
+│   ├── database.html         # Database browser (cards + detail)
 │   ├── css/
-│   │   └── style.css         # Dark theme styles
+│   │   ├── style.css         # Search page dark theme styles
+│   │   └── database.css      # Database browser Genshin website style
 │   └── js/
-│       └── app.js            # Frontend logic
+│       ├── app.js            # Search page frontend logic
+│       └── database.js      # Database browser frontend logic (routing/cards/detail)
 ├── routes/
-│   └── api.js                # API routes
+│   └── api.js                # API routes (search/category/item/count/list/folders)
 ├── services/
-│   └── genshinService.js     # Data service layer
+│   └── genshinService.js     # Data service (search/pagination/detail/summary)
 ├── tests/
 │   ├── api.test.js           # API integration tests
 │   └── service.test.js       # Service unit tests
@@ -461,6 +514,49 @@ List all item names in a category.
 }
 ```
 
+#### `GET /api/category/:folder`
+
+Get paginated item summaries for a category (used by the database browser card grid).
+
+**Parameters:**
+
+| Param | Type | Required | Description |
+|---|---|---|---|
+| `folder` | string | Yes | Data category name (path param) |
+| `page` | number | No | Page number, defaults to `DEFAULT_PAGE` config |
+| `pageSize` | number | No | Items per page, defaults to `DEFAULT_PAGE_SIZE` config |
+| `resultLanguage` | string | No | Result language |
+
+**Response:**
+
+```json
+{
+  "folder": "characters",
+  "page": 1,
+  "pageSize": 24,
+  "total": 120,
+  "totalPages": 5,
+  "items": [
+    { "name": "Amber", "rarity": 4, "elementText": "Pyro", "images": { ... } },
+    ...
+  ]
+}
+```
+
+#### `GET /api/item/:folder/:name`
+
+Get full detail data for a single item (used by the database browser detail panel).
+
+**Parameters:**
+
+| Param | Type | Required | Description |
+|---|---|---|---|
+| `folder` | string | Yes | Data category name (path param) |
+| `name` | string | Yes | Item name (path param) |
+| `resultLanguage` | string | No | Result language |
+
+**Response:** Returns the full genshin-db data object with all fields including name, id, description, images, costs, stats, etc.
+
 ### Configuration
 
 #### Environment Variables
@@ -470,6 +566,8 @@ List all item names in a category.
 | `PORT` | number | `3000` | Server listening port |
 | `RESULT_LANGUAGE` | string | `ChineseSimplified` | Default result output language |
 | `QUERY_LANGUAGES` | string (comma-separated) | `ChineseSimplified,English,Japanese,Korean` | Query input languages |
+| `DEFAULT_PAGE` | number | `1` | Database viewer default starting page |
+| `DEFAULT_PAGE_SIZE` | number | `24` | Database viewer items per page |
 
 #### Supported Languages
 

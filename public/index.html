@@ -7,103 +7,274 @@
     <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>原神数据库</h1>
-        <p class="subtitle">支持分类查询 · 综合搜索（跨所有类别）· 结果分页 · 七圣召唤</p>
-
-        <!-- 搜索栏 -->
-        <div class="search-box">
-            <input type="text" id="queryInput" placeholder="输入名称，如：芙宁娜、雾切、原石..." list="searchHistory" autocomplete="off" />
-            <datalist id="searchHistory"></datalist>
-
-            <select id="folderSelect">
-                <option value="all" style="color: #ffd200; font-weight: bold;">综合搜索（全部）</option>
-                <optgroup label="角色相关">
-                    <option value="characters">角色</option>
-                    <option value="talents">天赋</option>
-                    <option value="constellations">命之座</option>
-                    <option value="outfits">衣装</option>
-                </optgroup>
-                <optgroup label="装备道具">
-                    <option value="weapons">武器</option>
-                    <option value="artifacts">圣遗物</option>
-                    <option value="materials">材料</option>
-                </optgroup>
-                <optgroup label="世界探索">
-                    <option value="foods">食物</option>
-                    <option value="domains">秘境</option>
-                    <option value="enemies">敌人</option>
-                    <option value="animals">动物</option>
-                    <option value="geographies">地理志</option>
-                </optgroup>
-                <optgroup label="收集与成就">
-                    <option value="achievements">成就</option>
-                    <option value="achievementgroups">成就组</option>
-                    <option value="namecards">名片</option>
-                    <option value="windgliders">风之翼</option>
-                </optgroup>
-                <optgroup label="七圣召唤">
-                    <option value="tcgcharactercards">角色卡</option>
-                    <option value="tcgactioncards">行动卡</option>
-                    <option value="tcgcardbacks">卡背</option>
-                    <option value="tcgcardboxes">卡盒</option>
-                    <option value="tcgkeywords">关键词</option>
-                    <option value="tcgsummons">召唤物</option>
-                    <option value="tcgstatuseffects">状态效果</option>
-                    <option value="tcgdetailedrules">详细规则</option>
-                    <option value="tcglevelrewards">等级奖励</option>
-                </optgroup>
-                <optgroup label="其他">
-                    <option value="adventureranks">冒险等阶</option>
-                    <option value="elements">元素</option>
-                    <option value="crafts">锻造</option>
-                    <option value="rarity">稀有度</option>
-                    <option value="talentmaterialtypes">天赋材料类型</option>
-                </optgroup>
-            </select>
-
-            <span id="totalCountDisplay" class="total-count">总数：--</span>
-
-            <select id="langSelect">
-                <option value="ChineseSimplified">简体中文</option>
-                <option value="ChineseTraditional">繁體中文</option>
-                <option value="English">English</option>
-                <option value="French">Français</option>
-                <option value="German">Deutsch</option>
-                <option value="Indonesian">Bahasa Indonesia</option>
-                <option value="Japanese">日本語</option>
-                <option value="Korean">한국어</option>
-                <option value="Portuguese">Português</option>
-                <option value="Russian">Русский</option>
-                <option value="Spanish">Español</option>
-                <option value="Thai">ภาษาไทย</option>
-                <option value="Vietnamese">Tiếng Việt</option>
-            </select>
-
-            <button id="searchBtn">查询</button>
+    <!-- 顶部导航栏 -->
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a href="./index.html" class="site-logo">
+                <span class="site-logo-icon">&#127793;</span>
+                <span class="site-logo-text">原神数据库</span>
+            </a>
+            <nav class="site-nav">
+                <a href="./index.html" class="active">首页</a>
+                <a href="./search.html">搜索</a>
+                <a href="./database.html">百科</a>
+            </nav>
+            <div class="site-lang"></div>
         </div>
+    </header>
 
-        <!-- 结果展示 -->
-        <div class="result-area" id="resultArea">
-            <div class="placeholder">选择"综合搜索"可跨所有类别查询<br>也可选择具体分类精准查询</div>
+    <!-- Hero 区域 -->
+    <section class="home-hero">
+        <div class="home-hero-bg"></div>
+        <div class="home-hero-content">
+            <h1 class="home-hero-title">原神数据库</h1>
+            <p class="home-hero-subtitle">
+                <span>数据搜索</span>
+                <span class="sep">|</span>
+                <span>百科查看</span>
+                <span class="sep">|</span>
+                <span>genshin-db</span>
+            </p>
+
+            <div class="home-entry-cards">
+                <a href="./search.html" class="home-entry-card">
+                    <div class="card-icon">&#128269;</div>
+                    <div class="card-title">数据搜索</div>
+                    <div class="card-desc">精确查询角色、武器、圣遗物等全分类数据，支持综合跨类别搜索与多语言切换</div>
+                    <div class="card-arrow">&#8594;</div>
+                </a>
+
+                <a href="./database.html" class="home-entry-card teal">
+                    <div class="card-icon">&#128218;</div>
+                    <div class="card-title">数据库百科</div>
+                    <div class="card-desc">可视化浏览所有原神数据，卡片式图鉴展示，展开查看详细信息</div>
+                    <div class="card-arrow">&#8594;</div>
+                </a>
+            </div>
         </div>
+    </section>
 
-        <!-- 操作按钮 -->
-        <div class="action-bar" id="actionBar" style="display: none;">
-            <button id="copyBtn" class="action-btn">复制 JSON</button>
-            <button id="clearBtn" class="action-btn">清除</button>
-        </div>
+    <!-- 页脚 -->
+    <footer class="site-footer">
+        数据来源 <a href="https://www.npmjs.com/package/genshin-db" target="_blank" rel="noopener">genshin-db</a> · 风格参考 <a href="https://baike.mihoyo.com/ys/obc/" target="_blank" rel="noopener">米哈游观测枢</a> · by LingLan
+    </footer>
 
-        <!-- 分页控件 -->
-        <div class="pagination" id="pagination" style="display: none;">
-            <button id="prevPageBtn" disabled>◀ 上一页</button>
-            <span class="page-info" id="pageInfo">1 / 1</span>
-            <button id="nextPageBtn" disabled>下一页 ▶</button>
-        </div>
+    <style>
+        .home-hero {
+            position: relative;
+            min-height: calc(100vh - 56px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(180deg, var(--bg-darkest) 0%, var(--bg-dark) 50%, var(--bg-darkest) 100%);
+            overflow: hidden;
+            padding-top: 56px;
+        }
 
-        <div class="footer">数据版本随 npm 包更新 · 服务运行中</div>
-    </div>
+        .home-hero-bg {
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse at 30% 40%, rgba(79, 212, 212, 0.06) 0%, transparent 50%),
+                        radial-gradient(ellipse at 70% 60%, rgba(212, 163, 58, 0.05) 0%, transparent 50%);
+            animation: drift 20s ease-in-out infinite alternate;
+        }
 
-    <script src="./js/app.js"></script>
+        @keyframes drift {
+            from { transform: translate(0, 0); }
+            to { transform: translate(-30px, 20px); }
+        }
+
+        .home-hero-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .home-hero-title {
+            font-size: 4rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 50%, var(--gold) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.15em;
+            margin-bottom: 14px;
+            text-shadow: 0 0 60px rgba(212, 163, 58, 0.15);
+        }
+
+        .home-hero-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-dim);
+            letter-spacing: 0.25em;
+            margin-bottom: 56px;
+            text-transform: uppercase;
+        }
+
+        .home-hero-subtitle .sep {
+            color: var(--gold);
+            margin: 0 10px;
+        }
+
+        .home-entry-cards {
+            display: flex;
+            gap: 28px;
+            justify-content: center;
+            flex-wrap: wrap;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .home-entry-card {
+            position: relative;
+            width: 360px;
+            min-height: 260px;
+            border-radius: var(--radius);
+            overflow: hidden;
+            text-decoration: none;
+            color: var(--text);
+            background: var(--bg-card);
+            border: 1px solid rgba(212, 163, 58, 0.1);
+            transition: all var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 44px 28px;
+        }
+
+        .home-entry-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(145deg, var(--gold-dim) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity var(--transition);
+        }
+
+        .home-entry-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            transform: scaleX(0);
+            transition: transform 0.4s;
+        }
+
+        .home-entry-card:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .home-entry-card:hover::before {
+            opacity: 1;
+        }
+
+        .home-entry-card:hover::after {
+            transform: scaleX(1);
+        }
+
+        .home-entry-card .card-icon {
+            width: 72px;
+            height: 72px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            border: 2px solid rgba(212, 163, 58, 0.2);
+            border-radius: 50%;
+            color: var(--gold);
+            transition: all var(--transition);
+        }
+
+        .home-entry-card:hover .card-icon {
+            border-color: var(--gold);
+            transform: scale(1.08);
+            box-shadow: 0 0 24px var(--gold-dim);
+        }
+
+        .home-entry-card .card-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--gold-light);
+            margin-bottom: 10px;
+            letter-spacing: 0.1em;
+            position: relative;
+            z-index: 1;
+        }
+
+        .home-entry-card .card-desc {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            text-align: center;
+            line-height: 1.8;
+            max-width: 260px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .home-entry-card .card-arrow {
+            margin-top: 16px;
+            color: var(--gold);
+            font-size: 1.3rem;
+            opacity: 0;
+            transform: translateX(-8px);
+            transition: all var(--transition);
+            position: relative;
+            z-index: 1;
+        }
+
+        .home-entry-card:hover .card-arrow {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .home-entry-card.teal .card-icon {
+            border-color: rgba(79, 212, 212, 0.2);
+            color: var(--teal);
+        }
+
+        .home-entry-card.teal::after {
+            background: linear-gradient(90deg, transparent, var(--teal), transparent);
+        }
+
+        .home-entry-card.teal::before {
+            background: linear-gradient(145deg, rgba(79, 212, 212, 0.06) 0%, transparent 100%);
+        }
+
+        .home-entry-card.teal:hover {
+            border-color: rgba(79, 212, 212, 0.35);
+        }
+
+        .home-entry-card.teal:hover .card-icon {
+            border-color: var(--teal);
+            box-shadow: 0 0 24px rgba(79, 212, 212, 0.12);
+        }
+
+        .home-entry-card.teal .card-title {
+            color: var(--teal-light);
+        }
+
+        .home-entry-card.teal .card-arrow {
+            color: var(--teal);
+        }
+
+        @media (max-width: 768px) {
+            .home-hero-title { font-size: 2.2rem; }
+            .home-hero-subtitle { font-size: 0.85rem; letter-spacing: 0.15em; }
+            .home-entry-cards { flex-direction: column; gap: 16px; }
+            .home-entry-card { width: 100%; max-width: 360px; min-height: 200px; padding: 28px 20px; }
+            .home-entry-card .card-title { font-size: 1.3rem; }
+        }
+    </style>
 </body>
 </html>

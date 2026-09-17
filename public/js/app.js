@@ -126,7 +126,7 @@
 
     // ===== 清除结果 =====
     function clearResult() {
-        resultArea.innerHTML = `<div class="placeholder">选择"综合搜索"可跨所有类别查询<br>也可选择具体分类精准查询</div>`;
+        resultArea.innerHTML = '<div class="placeholder">选择"综合搜索"可跨所有类别查询<br>也可选择具体分类精准查询</div>';
         paginationDiv.style.display = 'none';
         actionBar.style.display = 'none';
         currentResultText = '';
@@ -139,7 +139,7 @@
         const resultLanguage = langSelect.value;
 
         if (!query) {
-            resultArea.innerHTML = `<span class="error-msg">请输入要查询的名称</span>`;
+            resultArea.innerHTML = '<span class="error-msg">请输入要查询的名称</span>';
             paginationDiv.style.display = 'none';
             actionBar.style.display = 'none';
             return;
@@ -167,7 +167,7 @@
                 totalPages = folderNames.length;
 
                 if (totalPages === 0) {
-                    resultArea.innerHTML = `<span class="error-msg">综合搜索未找到任何匹配</span>`;
+                    resultArea.innerHTML = '<span class="error-msg">综合搜索未找到任何匹配</span>';
                     paginationDiv.style.display = 'none';
                     actionBar.style.display = 'none';
                     return;
@@ -193,7 +193,7 @@
             actionBar.style.display = 'flex';
 
         } catch (error) {
-            resultArea.innerHTML = `<span class="error-msg">网络请求失败，请确保后端服务已启动 (node server.js)</span>`;
+            resultArea.innerHTML = '<span class="error-msg">网络请求失败，请确保后端服务已启动 (node server.js)</span>';
             paginationDiv.style.display = 'none';
             actionBar.style.display = 'none';
             console.error('Fetch error:', error);

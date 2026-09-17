@@ -17,6 +17,6 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 app.listen(config.port, () => {
-    console.log(`GenshinDB Search Web started!`);
+    console.log('GenshinDB Search Web started!');
     console.log(`Visit http://localhost:${config.port}`);
 });

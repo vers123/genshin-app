@@ -8,6 +8,9 @@ module.exports = {
         ? process.env.QUERY_LANGUAGES.split(',')
         : ['ChineseSimplified', 'English', 'Japanese', 'Korean'],
 
+    defaultPage: parseInt(process.env.DEFAULT_PAGE, 10) || 1,
+    defaultPageSize: parseInt(process.env.DEFAULT_PAGE_SIZE, 10) || 24,
+
     folders: [
         'characters', 'talents', 'constellations', 'outfits',
         'weapons', 'artifacts', 'materials',

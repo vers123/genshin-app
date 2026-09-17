@@ -42,4 +42,27 @@ router.get('/list', (req, res) => {
     res.json({ folder, names });
 });
 
+router.get('/category/:folder', (req, res) => {
+    const { folder } = req.params;
+    const page = parseInt(req.query.page, 10) || config.defaultPage;
+    const pageSize = parseInt(req.query.pageSize, 10) || config.defaultPageSize;
+    const { resultLanguage } = req.query;
+
+    const result = GenshinService.getCategoryItems(folder, page, pageSize, resultLanguage);
+    if (result === null) return res.status(400).json({ error: `Invalid category: "${folder}"` });
+    res.json(result);
+});
+
+router.get('/item/:folder/:name', (req, res) => {
+    const { folder, name } = req.params;
+    const { resultLanguage } = req.query;
+
+    if (!config.folders.includes(folder))
+        return res.status(400).json({ error: `Invalid category: "${folder}"` });
+
+    const result = GenshinService.getItemDetail(folder, name, resultLanguage);
+    if (result === null) return res.json({ error: `"${name}" not found in "${folder}"` });
+    res.json(result);
+});
+
 module.exports = router;

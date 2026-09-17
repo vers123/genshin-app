@@ -2,9 +2,9 @@
 
 # GenshinDB Search Web
 
-**A searchable web interface for the Genshin Impact database**
+**A searchable web interface and visual database browser for the Genshin Impact database**
 
-基于 [genshin-db](https://www.npmjs.com/package/genshin-db) 数据包构建的原神数据库搜索 Web 应用
+基于 [genshin-db](https://www.npmjs.com/package/genshin-db) 数据包构建的原神数据库搜索与百科浏览 Web 应用
 
 [功能特性](#功能特性) | [快速开始](#快速开始) | [使用指南](#使用指南) | [English](#english)
 
@@ -18,6 +18,10 @@
 
 - **全分类搜索** — 覆盖角色、武器、圣遗物、材料、食物、秘境、敌人等 20+ 个数据分类
 - **综合搜索** — 一次性跨所有分类查询，结果分页浏览
+- **数据库百科** — 可视化卡片图鉴浏览，展开查看详细信息，类似原神官网风格
+- **分类浏览** — 首页入口按分组展示所有分类，点击进入卡片网格视图
+- **手风琴详情** — 点击卡片弹出模态框，手风琴折叠展示基础信息、图片、升级素材、天赋技能等
+- **筛选与排序** — 支持名称筛选和稀有度/名称排序
 - **多语言支持** — 支持简体中文、繁体中文、英语、日语、韩语等 13 种语言
 - **自动补全** — 输入部分名称即可匹配（如输入 "amb" 自动匹配 "安柏"）
 - **实时数据** — 数据来源于 genshin-db npm 包，随版本更新
@@ -61,6 +65,14 @@ npm start
 
 启动后访问 http://localhost:3000 即可使用。
 
+#### 页面说明
+
+| 页面 | URL | 说明 |
+|---|---|---|
+| 首页 | `/` | 入口导航页，选择进入搜索或百科 |
+| 数据搜索 | `/search.html` | 精确/综合搜索，JSON 结果展示 |
+| 数据库百科 | `/database.html` | 卡片图鉴浏览，展开查看详情 |
+
 #### 开发模式
 
 ```bash
@@ -97,6 +109,8 @@ npm run dev
 | `PORT` | `3000` | 服务端口 |
 | `RESULT_LANGUAGE` | `ChineseSimplified` | 默认输出语言 |
 | `QUERY_LANGUAGES` | `ChineseSimplified,English,Japanese,Korean` | 查询输入语言列表 |
+| `DEFAULT_PAGE` | `1` | 数据库百科默认起始页 |
+| `DEFAULT_PAGE_SIZE` | `24` | 数据库百科每页条数 |
 
 ### 常见问题
 
@@ -143,6 +157,10 @@ npm run dev
 
 - **Full-category search** — Covers 20+ data categories including characters, weapons, artifacts, materials, food, domains, enemies, etc.
 - **Aggregated search** — Query across all categories at once with paginated results
+- **Database browser** — Visual card-based browsing with expandable details, Genshin official website style
+- **Category browsing** — Home page shows all categories grouped by type, click to enter card grid view
+- **Accordion details** — Click a card to open a modal with collapsible sections for basic info, images, ascension materials, talents, etc.
+- **Filter & sort** — Filter by name and sort by rarity or name
 - **Multi-language support** — Supports 13 languages including Chinese (Simplified/Traditional), English, Japanese, Korean, etc.
 - **Auto-completion** — Partial input matches automatically (e.g., typing "amb" matches "Amber")
 - **Up-to-date data** — Data sourced from the genshin-db npm package, updated with versions
@@ -186,6 +204,14 @@ npm start
 
 Visit http://localhost:3000 after starting.
 
+#### Pages
+
+| Page | URL | Description |
+|---|---|---|
+| Home | `/` | Entry navigation page |
+| Search | `/search.html` | Precise/aggregated search with JSON results |
+| Database | `/database.html` | Card-based visual browser with expandable details |
+
 #### Development Mode
 
 ```bash
@@ -222,6 +248,8 @@ The `.env` file supports the following options:
 | `PORT` | `3000` | Server port |
 | `RESULT_LANGUAGE` | `ChineseSimplified` | Default output language |
 | `QUERY_LANGUAGES` | `ChineseSimplified,English,Japanese,Korean` | Query input languages |
+| `DEFAULT_PAGE` | `1` | Database viewer default starting page |
+| `DEFAULT_PAGE_SIZE` | `24` | Database viewer items per page |
 
 ### FAQ
 

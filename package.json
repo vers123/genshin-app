@@ -23,6 +23,21 @@
   "author": "linglan",
   "license": "MIT",
   "type": "commonjs",
+  "jest": {
+    "testEnvironment": "node",
+    "projects": [
+      {
+        "displayName": "backend",
+        "testEnvironment": "node",
+        "testMatch": ["<rootDir>/tests/*.test.js"]
+      },
+      {
+        "displayName": "frontend",
+        "testEnvironment": "jsdom",
+        "testMatch": ["<rootDir>/tests/frontend/*.test.js"]
+      }
+    ]
+  },
   "dependencies": {
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
@@ -31,6 +46,7 @@
   "devDependencies": {
     "eslint": "^9.0.0",
     "jest": "^29.7.0",
+    "jest-environment-jsdom": "^30.5.1",
     "nodemon": "^3.1.14",
     "supertest": "^7.0.0"
   }

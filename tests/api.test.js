@@ -84,6 +84,77 @@ describe('API Routes', () => {
         });
     });
 
+    describe('GET /api/category/:folder', () => {
+        test('should return 400 for an invalid folder', async () => {
+            const res = await request(app).get('/api/category/invalidfolder');
+            expect(res.status).toBe(400);
+            expect(res.body.error).toBeDefined();
+        });
+
+        test('should return paginated items for a valid folder', async () => {
+            const res = await request(app).get('/api/category/characters?page=1&pageSize=5');
+            expect(res.status).toBe(200);
+            expect(res.body.folder).toBe('characters');
+            expect(res.body.page).toBe(1);
+            expect(res.body.pageSize).toBe(5);
+            expect(typeof res.body.total).toBe('number');
+            expect(res.body.total).toBeGreaterThan(0);
+            expect(typeof res.body.totalPages).toBe('number');
+            expect(res.body.totalPages).toBeGreaterThan(0);
+            expect(Array.isArray(res.body.items)).toBe(true);
+            expect(res.body.items.length).toBeLessThanOrEqual(5);
+        });
+
+        test('should return items with summary fields', async () => {
+            const res = await request(app).get('/api/category/characters?page=1&pageSize=1');
+            expect(res.status).toBe(200);
+            expect(res.body.items.length).toBe(1);
+            const item = res.body.items[0];
+            expect(item.name).toBeDefined();
+            expect(item.images).toBeDefined();
+        });
+
+        test('should use default pagination when not specified', async () => {
+            const res = await request(app).get('/api/category/weapons');
+            expect(res.status).toBe(200);
+            expect(res.body.page).toBe(1);
+            expect(res.body.pageSize).toBe(24);
+        });
+
+        test('should clamp page number beyond range', async () => {
+            const res = await request(app).get('/api/category/characters?page=99999');
+            expect(res.status).toBe(200);
+            expect(res.body.page).toBeLessThanOrEqual(res.body.totalPages);
+        });
+    });
+
+    describe('GET /api/item/:folder/:name', () => {
+        test('should return 400 for an invalid folder', async () => {
+            const res = await request(app).get('/api/item/invalidfolder/something');
+            expect(res.status).toBe(400);
+        });
+
+        test('should return detail data for a valid item', async () => {
+            const res = await request(app).get('/api/item/characters/amber');
+            expect(res.status).toBe(200);
+            expect(res.body).toBeDefined();
+            expect(res.body.error).toBeUndefined();
+            expect(res.body.name).toBeDefined();
+        });
+
+        test('should return error for non-existent item', async () => {
+            const res = await request(app).get('/api/item/characters/zzzznotexistzzzz');
+            expect(res.status).toBe(200);
+            expect(res.body.error).toBeDefined();
+        });
+
+        test('should support resultLanguage parameter', async () => {
+            const res = await request(app).get('/api/item/characters/amber?resultLanguage=English');
+            expect(res.status).toBe(200);
+            expect(res.body.name).toBe('Amber');
+        });
+    });
+
     describe('404 handler', () => {
         test('should return 404 for unknown routes', async () => {
             const res = await request(app).get('/nonexistent');
