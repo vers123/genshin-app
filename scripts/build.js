@@ -31,7 +31,8 @@ const INCLUDE_PATTERNS = [
     'LICENSE',
     'README.md',
     'nodemon.json',
-    'docs/releases'
+    'docs/releases',
+    'docs/licenses'
 ];
 
 // 排除规则（在被包含的目录内进一步过滤）

@@ -156,6 +156,13 @@ npm run dev
 
 [MIT License](LICENSE) - Copyright (c) 2026 昤兰
 
+**第三方依赖：**
+- [genshin-db](https://github.com/theBowja/genshin-db) — MIT License，Copyright (c) 2020 theBowja，详见 [docs/licenses/genshin-db-LICENSE.txt](docs/licenses/genshin-db-LICENSE.txt)
+
+**数据版权：**
+- 原神游戏数据及相关素材版权归 **COGNOSPHERE PTE. LTD. / miHoYo** 所有
+- 本项目仅作学习交流用途，不用于商业盈利
+
 ---
 
 ## English
@@ -301,3 +308,10 @@ For architecture design, API documentation, and contribution guidelines, see [De
 ### License
 
 [MIT License](LICENSE) - Copyright (c) 2026 昤兰
+
+**Third-party dependency:**
+- [genshin-db](https://github.com/theBowja/genshin-db) — MIT License, Copyright (c) 2020 theBowja, see [docs/licenses/genshin-db-LICENSE.txt](docs/licenses/genshin-db-LICENSE.txt)
+
+**Data copyright:**
+- Genshin Impact game data and assets are copyrighted by **COGNOSPHERE PTE. LTD. / miHoYo**
+- This project is for learning and educational purposes only, not for commercial use
