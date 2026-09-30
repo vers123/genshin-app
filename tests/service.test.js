@@ -291,4 +291,41 @@ describe('GenshinService', () => {
             expect(url).toBe('http://example.com/x.png');
         });
     });
+
+    describe('getChangelog', () => {
+        test('should return an array', () => {
+            const changelog = GenshinService.getChangelog();
+            expect(Array.isArray(changelog)).toBe(true);
+        });
+
+        test('should include v1.1.0 release notes', () => {
+            const changelog = GenshinService.getChangelog();
+            const release = changelog.find(r => r.version === '1.1.0');
+            expect(release).toBeDefined();
+            expect(release.tag).toBe('v1.1.0');
+            expect(release.content).toContain('搜索');
+        });
+
+        test('entries should have required fields', () => {
+            const changelog = GenshinService.getChangelog();
+            if (changelog.length > 0) {
+                const r = changelog[0];
+                expect(r).toHaveProperty('version');
+                expect(r).toHaveProperty('tag');
+                expect(r).toHaveProperty('content');
+                expect(r).toHaveProperty('date');
+                expect(r).toHaveProperty('filename');
+            }
+        });
+
+        test('should be sorted by version descending', () => {
+            const changelog = GenshinService.getChangelog();
+            for (let i = 1; i < changelog.length; i++) {
+                const prev = changelog[i - 1].version.split('.').map(Number);
+                const curr = changelog[i].version.split('.').map(Number);
+                const cmp = prev[0] - curr[0] || prev[1] - curr[1] || prev[2] - curr[2];
+                expect(cmp).toBeGreaterThanOrEqual(0);
+            }
+        });
+    });
 });

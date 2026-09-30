@@ -120,6 +120,23 @@ describe('API Routes', () => {
         });
     });
 
+    describe('GET /api/changelog', () => {
+        test('should return changelog with releases array', async () => {
+            const res = await request(app).get('/api/changelog');
+            expect(res.status).toBe(200);
+            expect(typeof res.body.total).toBe('number');
+            expect(Array.isArray(res.body.releases)).toBe(true);
+        });
+
+        test('should include v1.1.0 release', async () => {
+            const res = await request(app).get('/api/changelog');
+            const release = res.body.releases.find(r => r.version === '1.1.0');
+            expect(release).toBeDefined();
+            expect(release.tag).toBe('v1.1.0');
+            expect(release.content).toContain('搜索');
+        });
+    });
+
     describe('GET /api/list', () => {
         test('should return 400 without folder', async () => {
             const res = await request(app).get('/api/list');

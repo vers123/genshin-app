@@ -33,6 +33,12 @@ router.get('/folders', (_req, res) => {
     res.json({ folders: GenshinService.getFolders() });
 });
 
+// 更新日志：读取 docs/releases/*.md，按版本倒序返回
+router.get('/changelog', (_req, res) => {
+    const changelog = GenshinService.getChangelog();
+    res.json({ total: changelog.length, releases: changelog });
+});
+
 // 基于预建索引的模糊搜索（跨分类统一排名）
 router.get('/search-index', (req, res) => {
     const { q, folder, limit } = req.query;

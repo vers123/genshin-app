@@ -1,5 +1,9 @@
 const genshindb = require('genshin-db');
 const config = require('../config');
+const fs = require('fs');
+const path = require('path');
+
+const RELEASES_DIR = path.resolve(__dirname, '..', 'docs', 'releases');
 
 class GenshinService {
     // ===== 预建搜索索引（中英双语，启动时一次性构建，之后 O(n) 模糊匹配） =====
@@ -108,6 +112,39 @@ class GenshinService {
             if (images[key]) return images[key];
         }
         return null;
+    }
+
+    // ===== 更新日志：读取 docs/releases/*.md，按版本倒序 =====
+    static getChangelog() {
+        if (!fs.existsSync(RELEASES_DIR)) return [];
+
+        const files = fs.readdirSync(RELEASES_DIR)
+            .filter(f => /^v\d+\.\d+\.\d+\.md$/.test(f))
+            .map(f => {
+                const version = f.slice(1, -3); // v1.1.0.md -> 1.1.0
+                const filePath = path.join(RELEASES_DIR, f);
+                const stat = fs.statSync(filePath);
+                const content = fs.readFileSync(filePath, 'utf8');
+                return {
+                    version,
+                    tag: `v${version}`,
+                    filename: f,
+                    date: stat.mtime.toISOString().slice(0, 10),
+                    content
+                };
+            });
+
+        // 按语义化版本倒序
+        files.sort((a, b) => {
+            const pa = a.version.split('.').map(Number);
+            const pb = b.version.split('.').map(Number);
+            for (let i = 0; i < 3; i++) {
+                if (pb[i] !== pa[i]) return pb[i] - pa[i];
+            }
+            return 0;
+        });
+
+        return files;
     }
 
     static search(folder, query, resultLanguage) {

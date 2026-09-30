@@ -30,7 +30,8 @@ const INCLUDE_PATTERNS = [
     '.env.example',
     'LICENSE',
     'README.md',
-    'nodemon.json'
+    'nodemon.json',
+    'docs/releases'
 ];
 
 // 排除规则（在被包含的目录内进一步过滤）
@@ -103,15 +104,6 @@ function build() {
     // 收集所有文件
     const allFiles = collectFiles(ROOT, ROOT);
     const filesToPack = allFiles.filter(f => shouldInclude(f.relPath));
-
-    // 收集 docs/releases 中的版本说明文件（随归档附带）
-    const releaseNotesFile = path.join(ROOT, 'docs', 'releases', `v${version}.md`);
-    if (fs.existsSync(releaseNotesFile)) {
-        filesToPack.push({
-            fullPath: releaseNotesFile,
-            relPath: path.relative(ROOT, releaseNotesFile)
-        });
-    }
 
     console.log(`[build] 版本: v${version}`);
     console.log(`[build] 打包 ${filesToPack.length} 个文件`);

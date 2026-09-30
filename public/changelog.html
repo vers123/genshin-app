@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>更新日志 - 原神数据库</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <style>
+        .changelog-container {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 88px 28px 60px;
+        }
+        .changelog-page-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.1em;
+            margin-bottom: 6px;
+        }
+        .changelog-page-subtitle {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            margin-bottom: 36px;
+            letter-spacing: 0.05em;
+        }
+
+        /* 时间线 */
+        .timeline {
+            position: relative;
+            padding-left: 32px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 8px;
+            bottom: 8px;
+            width: 2px;
+            background: linear-gradient(180deg, var(--gold) 0%, var(--teal) 50%, var(--border) 100%);
+            opacity: 0.4;
+        }
+
+        .release-card {
+            position: relative;
+            margin-bottom: 28px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px 24px;
+            transition: all var(--transition);
+        }
+        .release-card::before {
+            content: '';
+            position: absolute;
+            left: -28px;
+            top: 26px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--gold);
+            box-shadow: 0 0 0 4px var(--bg-dark), 0 0 12px var(--gold-dim);
+        }
+        .release-card:hover {
+            border-color: var(--border-hover);
+            box-shadow: var(--shadow-card);
+            transform: translateX(4px);
+        }
+
+        .release-header {
+            display: flex;
+            align-items: baseline;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        .release-version {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--gold-light);
+            letter-spacing: 0.05em;
+        }
+        .release-date {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            background: var(--bg-darkest);
+            padding: 3px 10px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        .release-tag {
+            font-size: 0.72rem;
+            padding: 3px 10px;
+            border-radius: 12px;
+            background: var(--gold-dim);
+            color: var(--gold-light);
+            border: 1px solid var(--gold-border);
+        }
+
+        .release-body {
+            color: var(--text);
+            line-height: 1.8;
+            font-size: 0.92rem;
+        }
+        .release-body h1, .release-body h2, .release-body h3 {
+            color: var(--teal-light);
+            margin: 18px 0 10px;
+            font-weight: 700;
+        }
+        .release-body h1 { font-size: 1.3rem; }
+        .release-body h2 { font-size: 1.15rem; }
+        .release-body h3 { font-size: 1rem; }
+        .release-body p { margin: 8px 0; }
+        .release-body ul, .release-body ol {
+            margin: 8px 0;
+            padding-left: 24px;
+        }
+        .release-body li { margin: 4px 0; }
+        .release-body strong { color: var(--gold-light); font-weight: 600; }
+        .release-body code {
+            background: var(--bg-darkest);
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.85em;
+            color: var(--teal-light);
+        }
+        .release-body pre {
+            background: var(--bg-darkest);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 12px 14px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        .release-body pre code {
+            background: none;
+            padding: 0;
+            color: var(--text);
+        }
+        .release-body a {
+            color: var(--teal);
+            text-decoration: none;
+            border-bottom: 1px dashed var(--teal);
+        }
+        .release-body a:hover { color: var(--teal-light); }
+
+        .empty-changelog {
+            text-align: center;
+            color: var(--text-dim);
+            padding: 60px 20px;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 640px) {
+            .timeline { padding-left: 24px; }
+            .release-card { padding: 16px; }
+            .release-version { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="site-header-inner">
+            <a href="./index.html" class="site-logo">
+                <span class="site-logo-icon">&#127793;</span>
+                <span class="site-logo-text">原神数据库</span>
+            </a>
+            <nav class="site-nav">
+                <a href="./index.html">首页</a>
+                <a href="./search.html">搜索</a>
+                <a href="./database.html">百科</a>
+                <a href="./changelog.html" class="active">更新日志</a>
+            </nav>
+            <div class="site-lang"></div>
+        </div>
+    </header>
+
+    <main class="changelog-container">
+        <h1 class="changelog-page-title">更新日志</h1>
+        <p class="changelog-page-subtitle">记录每个版本的功能更新与优化</p>
+        <div class="timeline" id="timeline">
+            <div class="empty-changelog">加载中...</div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        数据来源 <a href="https://www.npmjs.com/package/genshin-db" target="_blank" rel="noopener">genshin-db</a> · 风格参考 <a href="https://baike.mihoyo.com/ys/obc/" target="_blank" rel="noopener">米哈游观测枢</a> · by LingLan
+    </footer>
+
+    <script src="./js/changelog.js"></script>
+</body>
+</html>

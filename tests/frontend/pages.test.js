@@ -36,16 +36,19 @@ describe('Frontend Page Structure', () => {
             const nav = doc.querySelector('.site-nav');
             expect(nav).not.toBeNull();
             const links = nav.querySelectorAll('a');
-            expect(links.length).toBe(3);
+            expect(links.length).toBe(4);
             expect(links[0].getAttribute('href')).toBe('./index.html');
             expect(links[0].classList.contains('active')).toBe(true);
+            // 最后一个链接应为更新日志
+            expect(links[links.length - 1].getAttribute('href')).toBe('./changelog.html');
         });
 
-        test('should have entry cards linking to search and database', () => {
+        test('should have entry cards linking to search, database and changelog', () => {
             const cards = doc.querySelectorAll('.home-entry-card');
-            expect(cards.length).toBe(2);
+            expect(cards.length).toBe(3);
             expect(cards[0].getAttribute('href')).toBe('./search.html');
             expect(cards[1].getAttribute('href')).toBe('./database.html');
+            expect(cards[2].getAttribute('href')).toBe('./changelog.html');
         });
 
         test('should have site footer', () => {
@@ -190,6 +193,35 @@ describe('Frontend Page Structure', () => {
             const dbStyleSheet = doc.querySelector('link[href="./css/database.css"]');
             expect(styleSheet).not.toBeNull();
             expect(dbStyleSheet).not.toBeNull();
+        });
+    });
+
+    describe('changelog.html', () => {
+        let doc;
+        beforeEach(() => {
+            doc = loadHtml('changelog.html');
+        });
+
+        test('should have correct title', () => {
+            expect(doc.querySelector('title').textContent).toContain('更新日志');
+        });
+
+        test('should have navigation with active state on changelog', () => {
+            const nav = doc.querySelector('.site-nav');
+            expect(nav).not.toBeNull();
+            const links = nav.querySelectorAll('a');
+            expect(links.length).toBe(4);
+            const active = nav.querySelector('a.active');
+            expect(active.getAttribute('href')).toBe('./changelog.html');
+        });
+
+        test('should have timeline container', () => {
+            expect(doc.getElementById('timeline')).not.toBeNull();
+        });
+
+        test('should load changelog.js script', () => {
+            const script = doc.querySelector('script[src="./js/changelog.js"]');
+            expect(script).not.toBeNull();
         });
     });
 
