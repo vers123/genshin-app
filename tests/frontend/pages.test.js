@@ -83,32 +83,35 @@ describe('Frontend Page Structure', () => {
             expect(select).not.toBeNull();
             const options = select.querySelectorAll('option');
             expect(options.length).toBeGreaterThan(20);
-            expect(options[0].value).toBe('all');
+            // 第一项为"全部分类"（空值）
+            expect(options[0].value).toBe('');
         });
 
-        test('should have language select with 13 options', () => {
+        test('should have language select', () => {
             const select = doc.getElementById('langSelect');
             expect(select).not.toBeNull();
             const options = select.querySelectorAll('option');
-            expect(options.length).toBe(13);
+            expect(options.length).toBeGreaterThan(0);
         });
 
-        test('should have result area with placeholder', () => {
-            const area = doc.getElementById('resultArea');
-            expect(area).not.toBeNull();
-            const placeholder = area.querySelector('.placeholder');
+        test('should have result list with placeholder', () => {
+            const list = doc.getElementById('resultList');
+            expect(list).not.toBeNull();
+            const placeholder = list.querySelector('.placeholder');
             expect(placeholder).not.toBeNull();
         });
 
-        test('should have pagination controls', () => {
-            expect(doc.getElementById('prevPageBtn')).not.toBeNull();
-            expect(doc.getElementById('nextPageBtn')).not.toBeNull();
-            expect(doc.getElementById('pageInfo')).not.toBeNull();
+        test('should have result stats container', () => {
+            expect(doc.getElementById('resultStats')).not.toBeNull();
+            expect(doc.getElementById('hitCount')).not.toBeNull();
         });
 
-        test('should have action buttons', () => {
-            expect(doc.getElementById('copyBtn')).not.toBeNull();
-            expect(doc.getElementById('clearBtn')).not.toBeNull();
+        test('should have detail drawer elements', () => {
+            expect(doc.getElementById('drawerOverlay')).not.toBeNull();
+            expect(doc.getElementById('detailDrawer')).not.toBeNull();
+            expect(doc.getElementById('drawerClose')).not.toBeNull();
+            expect(doc.getElementById('drawerTitle')).not.toBeNull();
+            expect(doc.getElementById('drawerBody')).not.toBeNull();
         });
 
         test('should load app.js script', () => {

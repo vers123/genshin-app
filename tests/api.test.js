@@ -69,6 +69,57 @@ describe('API Routes', () => {
         });
     });
 
+    describe('GET /api/search-index', () => {
+        test('should return 400 without q parameter', async () => {
+            const res = await request(app).get('/api/search-index');
+            expect(res.status).toBe(400);
+            expect(res.body.error).toBeDefined();
+        });
+
+        test('should return 400 with empty q', async () => {
+            const res = await request(app).get('/api/search-index?q=');
+            expect(res.status).toBe(400);
+        });
+
+        test('should return ranked results for a valid query', async () => {
+            const res = await request(app).get('/api/search-index?q=amber');
+            expect(res.status).toBe(200);
+            expect(typeof res.body.total).toBe('number');
+            expect(res.body.total).toBeGreaterThan(0);
+            expect(Array.isArray(res.body.results)).toBe(true);
+            expect(res.body.results.length).toBeGreaterThan(0);
+        });
+
+        test('results should have score, folder, nameEn, nameZh fields', async () => {
+            const res = await request(app).get('/api/search-index?q=zhongli');
+            expect(res.status).toBe(200);
+            const item = res.body.results[0];
+            expect(item).toHaveProperty('score');
+            expect(item).toHaveProperty('folder');
+            expect(item).toHaveProperty('nameEn');
+            expect(item).toHaveProperty('nameZh');
+        });
+
+        test('should support folder filter', async () => {
+            const res = await request(app).get('/api/search-index?q=amber&folder=weapons');
+            expect(res.status).toBe(200);
+            expect(res.body.results.every(r => r.folder === 'weapons')).toBe(true);
+        });
+
+        test('should support limit parameter', async () => {
+            const res = await request(app).get('/api/search-index?q=a&limit=3');
+            expect(res.status).toBe(200);
+            expect(res.body.results.length).toBeLessThanOrEqual(3);
+        });
+
+        test('should return empty results for non-matching query', async () => {
+            const res = await request(app).get('/api/search-index?q=zzzznotexistzzzz');
+            expect(res.status).toBe(200);
+            expect(res.body.total).toBe(0);
+            expect(res.body.results).toEqual([]);
+        });
+    });
+
     describe('GET /api/list', () => {
         test('should return 400 without folder', async () => {
             const res = await request(app).get('/api/list');

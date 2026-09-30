@@ -5,6 +5,254 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>数据搜索 - 原神数据库</title>
     <link rel="stylesheet" href="./css/style.css">
+    <style>
+        /* ===== 搜索页 ===== */
+        .search-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 88px 28px 60px;
+        }
+        .search-page-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.1em;
+            margin-bottom: 6px;
+        }
+        .search-page-subtitle {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            margin-bottom: 24px;
+            letter-spacing: 0.05em;
+        }
+        .search-box {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px;
+            margin-bottom: 22px;
+        }
+        .search-box input[type="text"] {
+            flex: 1;
+            min-width: 240px;
+            background: var(--bg-darkest);
+            border: 1px solid var(--border);
+            color: var(--text-bright);
+            padding: 10px 14px;
+            border-radius: var(--radius);
+            font-size: 15px;
+            outline: none;
+            transition: border-color var(--transition);
+        }
+        .search-box input[type="text"]:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px var(--gold-dim);
+        }
+        .search-box select {
+            background: var(--bg-darkest);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 10px 12px;
+            border-radius: var(--radius);
+            font-size: 14px;
+            outline: none;
+            cursor: pointer;
+        }
+        .search-box select:focus { border-color: var(--gold); }
+        .total-count {
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        /* 结果统计条 */
+        .result-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+        .result-stats .hit { color: var(--gold); font-weight: 600; }
+
+        /* 结果列表 */
+        .result-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .result-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+        .result-item:hover {
+            border-color: var(--border-hover);
+            background: var(--bg-card-hover);
+            transform: translateX(4px);
+            box-shadow: var(--shadow-card);
+        }
+        .result-item .cat-badge {
+            font-size: 0.72rem;
+            padding: 3px 10px;
+            border-radius: 12px;
+            background: var(--gold-dim);
+            color: var(--gold-light);
+            white-space: nowrap;
+            border: 1px solid var(--gold-border);
+            flex-shrink: 0;
+        }
+        .result-item .names { flex: 1; min-width: 0; }
+        .result-item .name-zh {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-bright);
+        }
+        .result-item .name-en {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-top: 2px;
+        }
+        .result-item .score-bar {
+            width: 60px;
+            height: 4px;
+            background: var(--bg-darkest);
+            border-radius: 2px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .result-item .score-bar > span {
+            display: block;
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold), var(--teal));
+            border-radius: 2px;
+        }
+
+        .placeholder, .empty {
+            text-align: center;
+            color: var(--text-dim);
+            padding: 60px 20px;
+            font-size: 0.9rem;
+        }
+        .placeholder .hint { color: var(--gold); margin-top: 8px; }
+
+        /* ===== 详情抽屉 ===== */
+        .drawer-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s;
+        }
+        .drawer-overlay.show { opacity: 1; pointer-events: auto; }
+        .detail-drawer {
+            position: fixed;
+            top: 0; right: 0;
+            height: 100vh;
+            width: min(560px, 94vw);
+            background: var(--bg-dark);
+            z-index: 210;
+            overflow-y: auto;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.2,0.8,0.2,1);
+            box-shadow: -8px 0 32px rgba(0,0,0,0.5);
+            border-left: 1px solid var(--gold-border);
+        }
+        .detail-drawer.show { transform: translateX(0); }
+        .drawer-close {
+            position: absolute;
+            top: 16px; right: 20px;
+            background: none; border: none;
+            color: var(--text-dim);
+            font-size: 26px;
+            cursor: pointer;
+            line-height: 1;
+            z-index: 5;
+        }
+        .drawer-close:hover { color: var(--gold); }
+        .drawer-hero {
+            padding: 28px 24px 20px;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-dark) 100%);
+        }
+        .drawer-hero-top { display: flex; gap: 18px; align-items: flex-start; }
+        .drawer-hero-img {
+            width: 92px; height: 92px;
+            border-radius: var(--radius);
+            background: var(--bg-darkest);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .drawer-hero-img img { width: 100%; height: 100%; object-fit: contain; }
+        .drawer-hero-text h2 {
+            font-size: 1.5rem;
+            color: var(--gold-light);
+            margin-bottom: 4px;
+        }
+        .drawer-hero-text .en { color: var(--text-dim); font-size: 0.85rem; }
+        .drawer-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+        .drawer-meta .tag {
+            font-size: 0.72rem;
+            padding: 3px 10px;
+            border-radius: 12px;
+            background: rgba(79,212,212,0.1);
+            color: var(--teal-light);
+            border: 1px solid rgba(79,212,212,0.2);
+        }
+        .drawer-meta .tag.rarity { background: var(--gold-dim); color: var(--gold-light); border-color: var(--gold-border); }
+        .drawer-body { padding: 20px 24px 40px; }
+        .drawer-sec { margin-bottom: 22px; }
+        .drawer-sec h3 {
+            font-size: 0.8rem;
+            color: var(--gold);
+            letter-spacing: 0.1em;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        .drawer-sec p { line-height: 1.7; font-size: 0.9rem; color: var(--text); }
+        .drawer-kv { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+        .drawer-kv td { padding: 7px 0; border-bottom: 1px solid var(--border); vertical-align: top; }
+        .drawer-kv td:first-child { color: var(--text-dim); width: 110px; }
+        .drawer-skill { padding: 10px 0; border-bottom: 1px solid var(--border); }
+        .drawer-skill b { font-size: 0.9rem; color: var(--gold-light); }
+        .drawer-skill p { margin: 4px 0 0; font-size: 0.83rem; color: var(--text-dim); line-height: 1.6; }
+        .drawer-part { display: flex; gap: 10px; align-items: center; padding: 6px 0; }
+        .drawer-part img { width: 36px; height: 36px; object-fit: contain; background: var(--bg-darkest); border-radius: 4px; }
+        .drawer-json {
+            background: var(--bg-darkest);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.78rem;
+            color: var(--teal-light);
+            overflow-x: auto;
+            max-height: 360px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        @media (max-width: 640px) {
+            .search-box { flex-direction: column; align-items: stretch; }
+            .search-box select { width: 100%; }
+        }
+    </style>
 </head>
 <body>
     <!-- 顶部导航栏 -->
@@ -26,15 +274,15 @@
     <!-- 主内容区 -->
     <main class="search-container">
         <h1 class="search-page-title">数据搜索</h1>
-        <p class="search-page-subtitle">支持分类查询 · 综合搜索（跨所有类别）· 结果分页 · 七圣召唤</p>
+        <p class="search-page-subtitle">实时模糊搜索 · 跨分类统一排名 · 支持中英文 · 点击查看详情</p>
 
         <!-- 搜索栏 -->
         <div class="search-box">
-            <input type="text" id="queryInput" placeholder="输入名称，如：芙宁娜、雾切、原石..." list="searchHistory" autocomplete="off" />
+            <input type="text" id="queryInput" placeholder="输入名称，如：芙宁娜、雾切、homa、原石..." list="searchHistory" autocomplete="off" autofocus />
             <datalist id="searchHistory"></datalist>
 
             <select id="folderSelect">
-                <option value="all" style="color: var(--gold); font-weight: bold;">综合搜索（全部）</option>
+                <option value="">全部分类</option>
                 <optgroup label="角色相关">
                     <option value="characters">角色</option>
                     <option value="talents">天赋</option>
@@ -79,45 +327,48 @@
                 </optgroup>
             </select>
 
-            <span id="totalCountDisplay" class="total-count">总数：--</span>
-
             <select id="langSelect">
                 <option value="ChineseSimplified">简体中文</option>
                 <option value="ChineseTraditional">繁體中文</option>
                 <option value="English">English</option>
-                <option value="French">Français</option>
-                <option value="German">Deutsch</option>
-                <option value="Indonesian">Bahasa Indonesia</option>
                 <option value="Japanese">日本語</option>
                 <option value="Korean">한국어</option>
-                <option value="Portuguese">Português</option>
-                <option value="Russian">Русский</option>
-                <option value="Spanish">Español</option>
-                <option value="Thai">ภาษาไทย</option>
-                <option value="Vietnamese">Tiếng Việt</option>
             </select>
-
-            <button id="searchBtn">查询</button>
         </div>
 
-        <!-- 结果展示 -->
-        <div class="result-area" id="resultArea">
-            <div class="placeholder">选择"综合搜索"可跨所有类别查询<br>也可选择具体分类精准查询</div>
+        <!-- 结果统计 -->
+        <div class="result-stats" id="resultStats" style="display:none;">
+            <span>找到 <span class="hit" id="hitCount">0</span> 条匹配</span>
+            <span id="searchMode">模糊搜索</span>
         </div>
 
-        <!-- 操作按钮 -->
-        <div class="action-bar" id="actionBar" style="display: none;">
-            <button id="copyBtn" class="action-btn">复制 JSON</button>
-            <button id="clearBtn" class="action-btn">清除</button>
-        </div>
-
-        <!-- 分页控件 -->
-        <div class="pagination" id="pagination" style="display: none;">
-            <button id="prevPageBtn" disabled>◀ 上一页</button>
-            <span class="page-info" id="pageInfo">1 / 1</span>
-            <button id="nextPageBtn" disabled>下一页 ▶</button>
+        <!-- 结果列表 -->
+        <div class="result-list" id="resultList">
+            <div class="placeholder">
+                输入关键词开始搜索（支持中英文）<br>
+                <span class="hint">例如：钟离、hutao、护摩、gladiator</span>
+            </div>
         </div>
     </main>
+
+    <!-- 详情抽屉 -->
+    <div class="drawer-overlay" id="drawerOverlay"></div>
+    <aside class="detail-drawer" id="detailDrawer">
+        <button class="drawer-close" id="drawerClose">&times;</button>
+        <div class="drawer-hero">
+            <div class="drawer-hero-top">
+                <div class="drawer-hero-img" id="drawerHeroImg"></div>
+                <div class="drawer-hero-text">
+                    <h2 id="drawerTitle">详情</h2>
+                    <div class="en" id="drawerEn"></div>
+                    <div class="drawer-meta" id="drawerMeta"></div>
+                </div>
+            </div>
+        </div>
+        <div class="drawer-body" id="drawerBody">
+            <div class="empty">加载中...</div>
+        </div>
+    </aside>
 
     <!-- 页脚 -->
     <footer class="site-footer">

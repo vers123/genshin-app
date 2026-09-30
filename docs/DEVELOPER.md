@@ -17,8 +17,10 @@
 - [API 文档](#api-文档)
 - [配置说明](#配置说明)
 - [本地开发](#本地开发)
+- [构建](#构建)
 - [测试](#测试)
 - [部署](#部署)
+- [发布](#发布)
 - [贡献指南](#贡献指南)
 
 ### 架构设计
@@ -274,6 +276,20 @@ npm run lint
 npm run lint:fix
 ```
 
+### 构建
+
+将生产运行所需文件打包为 zip 归档（排除 tests、.github、node_modules 等）。
+
+```bash
+# 使用 package.json 中的版本号
+npm run build
+
+# 指定版本号（会同步更新 package.json）
+npm run build 1.2.0
+```
+
+产物位于 `dist/genshin-app-v<版本号>.zip`。
+
 ### 测试
 
 项目使用 Jest 作为测试框架。
@@ -314,6 +330,34 @@ npm start
 
 确保目标环境已安装 Node.js 18+，并正确配置 `.env` 文件。
 
+### 发布
+
+项目通过 GitHub Actions 自动构建并发布 Release。
+
+#### 发布流程
+
+1. **编写版本更新说明**：在 `docs/releases/` 下创建 `v<版本号>.md` 文件（如 `docs/releases/v1.2.0.md`），内容作为 Release 的说明文本。
+2. **提交并推送代码**：确保所有更改已提交到 `main` 分支。
+3. **打 tag 并推送**：
+
+   ```bash
+   git tag v1.2.0
+   git push origin v1.2.0
+   ```
+
+4. **自动构建发布**：GitHub Actions 检测到 tag 推送后，会自动：
+   - 运行 Lint 和测试
+   - 从 tag 名提取版本号（去掉 `v` 前缀）
+   - 校验 `docs/releases/v1.2.0.md` 是否存在
+   - 执行 `npm run build 1.2.0` 生成 `dist/genshin-app-v1.2.0.zip`
+   - 创建 GitHub Release，以 `docs/releases/v1.2.0.md` 为说明，zip 为附件
+
+#### 注意事项
+
+- Tag 命名必须为 `v` 前缀格式（如 `v1.2.0`）。
+- 发布前必须先创建对应的 `docs/releases/v<版本号>.md` 文件，否则 CI 会失败。
+- 需在仓库 **Settings → Actions → General → Workflow permissions** 中设置为 **Read and write permissions**，以便 CI 创建 Release。
+
 ### 贡献指南
 
 1. Fork 本仓库
@@ -350,8 +394,10 @@ npm start
 - [API Documentation](#api-documentation)
 - [Configuration](#configuration)
 - [Local Development](#local-development-1)
+- [Build](#build)
 - [Testing](#testing-1)
 - [Deployment](#deployment-1)
+- [Release](#release)
 - [Contributing](#contributing-1)
 
 ### Architecture
@@ -607,6 +653,20 @@ npm run lint
 npm run lint:fix
 ```
 
+### Build
+
+Packages production runtime files into a zip archive (excludes tests, .github, node_modules, etc.).
+
+```bash
+# Use version from package.json
+npm run build
+
+# Specify version (also updates package.json)
+npm run build 1.2.0
+```
+
+Output: `dist/genshin-app-v<version>.zip`.
+
 ### Testing
 
 The project uses Jest as its test framework.
@@ -646,6 +706,34 @@ npm start
 ```
 
 Ensure Node.js 18+ is installed and `.env` is configured correctly.
+
+### Release
+
+The project uses GitHub Actions to automatically build and publish releases.
+
+#### Release process
+
+1. **Write release notes**: Create `docs/releases/v<version>.md` (e.g. `docs/releases/v1.2.0.md`) — its content becomes the Release description.
+2. **Commit and push** all changes to the `main` branch.
+3. **Tag and push**:
+
+   ```bash
+   git tag v1.2.0
+   git push origin v1.2.0
+   ```
+
+4. **Auto build & release**: GitHub Actions detects the tag push and automatically:
+   - Runs Lint and tests
+   - Extracts version from tag name (strips `v` prefix)
+   - Verifies `docs/releases/v1.2.0.md` exists
+   - Runs `npm run build 1.2.0` to produce `dist/genshin-app-v1.2.0.zip`
+   - Creates a GitHub Release using the md file as body and the zip as asset
+
+#### Notes
+
+- Tags must use the `v` prefix (e.g. `v1.2.0`).
+- The corresponding `docs/releases/v<version>.md` must exist before pushing the tag, otherwise CI fails.
+- Set **Settings → Actions → General → Workflow permissions** to **Read and write permissions** so CI can create releases.
 
 ### Contributing
 

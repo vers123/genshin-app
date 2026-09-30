@@ -33,6 +33,17 @@ router.get('/folders', (_req, res) => {
     res.json({ folders: GenshinService.getFolders() });
 });
 
+// 基于预建索引的模糊搜索（跨分类统一排名）
+router.get('/search-index', (req, res) => {
+    const { q, folder, limit } = req.query;
+    if (!q || !String(q).trim()) {
+        return res.status(400).json({ error: 'Missing required parameter: q' });
+    }
+    const limitNum = Math.min(parseInt(limit, 10) || 30, 100);
+    const result = GenshinService.fuzzySearch(q, limitNum, folder);
+    res.json(result);
+});
+
 router.get('/list', (req, res) => {
     const { folder, resultLanguage } = req.query;
     if (!folder) return res.status(400).json({ error: 'Missing required parameter: folder' });

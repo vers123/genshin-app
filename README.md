@@ -70,7 +70,7 @@ npm start
 | 页面 | URL | 说明 |
 |---|---|---|
 | 首页 | `/` | 入口导航页，选择进入搜索或百科 |
-| 数据搜索 | `/search.html` | 精确/综合搜索，JSON 结果展示 |
+| 数据搜索 | `/search.html` | 实时模糊搜索，跨分类统一排名，点击查看详情 |
 | 数据库百科 | `/database.html` | 卡片图鉴浏览，展开查看详情 |
 
 #### 开发模式
@@ -145,6 +145,13 @@ npm run dev
 
 如需了解架构设计、API 文档、贡献指南等内容，请查阅 [开发者文档](docs/DEVELOPER.md)。
 
+### 构建与发布
+
+- **本地构建**：`npm run build` 生成 `dist/genshin-app-v<版本>.zip`
+- **发布流程**：推送 tag（如 `git tag v1.2.0 && git push origin v1.2.0`）后，GitHub Actions 自动构建并创建 Release
+- **版本说明**：发布前需在 `docs/releases/v<版本>.md` 编写更新说明，作为 Release 描述文本
+- 详见 [开发者文档 - 发布章节](docs/DEVELOPER.md#发布)
+
 ### 许可证
 
 [MIT License](LICENSE) - Copyright (c) 2026 昤兰
@@ -209,7 +216,7 @@ Visit http://localhost:3000 after starting.
 | Page | URL | Description |
 |---|---|---|
 | Home | `/` | Entry navigation page |
-| Search | `/search.html` | Precise/aggregated search with JSON results |
+| Search | `/search.html` | Real-time fuzzy search, unified cross-category ranking, click to view details |
 | Database | `/database.html` | Card-based visual browser with expandable details |
 
 #### Development Mode
@@ -283,6 +290,13 @@ Change the `PORT` value in the `.env` file, e.g., `PORT=8080`.
 ### Developer Documentation
 
 For architecture design, API documentation, and contribution guidelines, see [Developer Documentation](docs/DEVELOPER.md).
+
+### Build & Release
+
+- **Local build**: `npm run build` produces `dist/genshin-app-v<version>.zip`
+- **Release flow**: Push a tag (e.g. `git tag v1.2.0 && git push origin v1.2.0`) — GitHub Actions automatically builds and creates a Release
+- **Release notes**: Create `docs/releases/v<version>.md` before tagging; its content becomes the Release description
+- See [Developer Docs - Release section](docs/DEVELOPER.md#release) for details
 
 ### License
 

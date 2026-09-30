@@ -2,6 +2,114 @@ const genshindb = require('genshin-db');
 const config = require('../config');
 
 class GenshinService {
+    // ===== 预建搜索索引（中英双语，启动时一次性构建，之后 O(n) 模糊匹配） =====
+    static _searchIndex = null;
+
+    static buildIndex() {
+        if (this._searchIndex) return this._searchIndex;
+
+        const index = [];
+        for (const folder of config.folders) {
+            if (typeof genshindb[folder] !== 'function') continue;
+            try {
+                // 英文条目（含 id）
+                const itemsEn = genshindb[folder]('names', {
+                    matchCategories: true,
+                    verboseCategories: true,
+                    queryLanguages: ['English']
+                }) || [];
+                // 中文条目
+                const itemsZh = genshindb[folder]('names', {
+                    matchCategories: true,
+                    verboseCategories: true,
+                    queryLanguages: ['English'],
+                    resultLanguage: 'ChineseSimplified'
+                }) || [];
+
+                const zhById = new Map();
+                for (const x of itemsZh) {
+                    const id = (x && typeof x === 'object') ? (x.id ?? x.name) : x;
+                    const name = (x && typeof x === 'object') ? x.name : x;
+                    zhById.set(String(id), name);
+                }
+
+                for (const x of itemsEn) {
+                    const id = (x && typeof x === 'object') ? (x.id ?? x.name) : x;
+                    const nameEn = (x && typeof x === 'object') ? x.name : x;
+                    if (!nameEn) continue;
+                    index.push({
+                        id: String(id),
+                        nameEn: String(nameEn),
+                        nameZh: zhById.get(String(id)) || String(nameEn),
+                        folder,
+                        label: config.folderLabels[folder] || folder
+                    });
+                }
+            } catch (e) {
+                console.warn(`[index] 跳过 ${folder}: ${e.message}`);
+            }
+        }
+        this._searchIndex = index;
+        return index;
+    }
+
+    /**
+     * 模糊搜索：对索引进行相关度打分并排序
+     * 打分规则：完全匹配 100 > 前缀匹配 80 > 包含匹配 60
+     * @param {string} query 搜索关键词
+     * @param {number} limit 最大返回条数
+     * @param {string} [folder] 可选，限定分类
+     */
+    static fuzzySearch(query, limit = 30, folder) {
+        const q = String(query || '').trim().toLowerCase();
+        if (!q) return { total: 0, results: [] };
+
+        const index = this.buildIndex();
+        const pool = folder ? index.filter(i => i.folder === folder) : index;
+
+        const results = [];
+        for (const item of pool) {
+            const en = (item.nameEn || '').toLowerCase();
+            const zh = (item.nameZh || '').toLowerCase();
+            let score = 0;
+            if (en === q || zh === q) score = 100;
+            else if (en.startsWith(q) || zh.startsWith(q)) score = 80;
+            else if (en.includes(q) || zh.includes(q)) score = 60;
+            if (score > 0) results.push({ ...item, score });
+        }
+
+        results.sort((a, b) => b.score - a.score || a.nameEn.localeCompare(b.nameEn));
+        const limited = results.slice(0, limit);
+        return { total: results.length, results: limited };
+    }
+
+    // ===== Enka CDN 图片解析（从 filename_* 字段拼出 CDN URL） =====
+    static resolveEnkaImage(images, prefer) {
+        if (!images || typeof images !== 'object') return null;
+        const order = prefer
+            ? [prefer, 'filename_gachaSplash', 'filename_gacha', 'filename_gachasplash',
+                'filename_icon', 'filename_awakenicon', 'filename_sideIcon']
+            : ['filename_gachaSplash', 'filename_gacha', 'filename_gachasplash',
+                'filename_icon', 'filename_awakenicon', 'filename_sideIcon'];
+        for (const key of order) {
+            if (images[key]) return `${config.enkaCdn}${images[key]}.png`;
+        }
+        return null;
+    }
+
+    // ===== 通用图片解析：优先 Enka CDN，回退到远程 URL =====
+    static resolveImage(images, prefer) {
+        const enka = this.resolveEnkaImage(images, prefer);
+        if (enka) return enka;
+        if (!images) return null;
+        const remoteKeys = ['mihoyo_icon', 'hoyowiki_icon', 'card', 'icon', 'portrait',
+            'cover1', 'cover2', 'image', 'url', 'bannerImg'];
+        for (const key of remoteKeys) {
+            if (images[key]) return images[key];
+        }
+        return null;
+    }
+
     static search(folder, query, resultLanguage) {
         if (typeof genshindb[folder] !== 'function') return null;
         const options = {
@@ -100,6 +208,9 @@ class GenshinService {
 
     static extractSummary(folder, data) {
         const summary = { name: data.name || '' };
+        // 优先 Enka CDN 图片，回退远程 URL
+        const imageUrl = this.resolveImage(data.images, 'filename_icon');
+        if (imageUrl) summary.imageUrl = imageUrl;
         if (data.rarity) summary.rarity = data.rarity;
         if (data.id) summary.id = data.id;
         if (data.elementText) summary.elementText = data.elementText;

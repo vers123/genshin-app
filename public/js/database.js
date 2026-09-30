@@ -284,9 +284,14 @@
         });
     }
 
-    // ===== 获取物品图片 =====
+    // ===== 获取物品图片（优先 Enka CDN，回退远程 URL） =====
+    const ENKA_CDN = 'https://enka.network/ui/';
     function getItemImage(item) {
         if (!item.images) return null;
+        const enkaOrder = ['filename_icon', 'filename_gachaSplash', 'filename_gacha', 'filename_awakenicon', 'filename_sideIcon'];
+        for (const k of enkaOrder) {
+            if (item.images[k]) return ENKA_CDN + item.images[k] + '.png';
+        }
         return item.images.mihoyo_icon
             || item.images.hoyowiki_icon
             || item.images.card

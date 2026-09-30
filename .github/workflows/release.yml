@@ -1,0 +1,59 @@
+name: Release
+
+# 手动推送 tag 时触发（tag 格式：v1.2.0）
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm test
+
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+
+      - name: Check release notes exist
+        run: |
+          NOTES_FILE="docs/releases/${GITHUB_REF_NAME}.md"
+          if [ ! -f "$NOTES_FILE" ]; then
+            echo "::error::Release notes file not found: $NOTES_FILE"
+            echo "Please create $NOTES_FILE with the changelog for this release before pushing the tag."
+            exit 1
+          fi
+          echo "Release notes found: $NOTES_FILE"
+
+      - name: Build distribution archive
+        run: npm run build ${{ steps.version.outputs.VERSION }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          body_path: docs/releases/${{ github.ref_name }}.md
+          files: dist/genshin-app-${{ github.ref_name }}.zip
+          generate_release_notes: false

@@ -177,5 +177,118 @@ describe('GenshinService', () => {
             const summary = GenshinService.extractSummary('characters', data);
             expect(summary.elementText).toBeDefined();
         });
+
+        test('should include imageUrl resolved from Enka CDN or remote', () => {
+            const data = GenshinService.getItemDetail('characters', 'amber');
+            const summary = GenshinService.extractSummary('characters', data);
+            // 角色通常有图片，imageUrl 应为字符串
+            expect(typeof summary.imageUrl).toBe('string');
+        });
+    });
+
+    describe('buildIndex', () => {
+        test('should return an array with entries', () => {
+            const index = GenshinService.buildIndex();
+            expect(Array.isArray(index)).toBe(true);
+            expect(index.length).toBeGreaterThan(1000);
+        });
+
+        test('each entry should have id, nameEn, nameZh, folder, label', () => {
+            const index = GenshinService.buildIndex();
+            const item = index[0];
+            expect(item).toHaveProperty('id');
+            expect(item).toHaveProperty('nameEn');
+            expect(item).toHaveProperty('nameZh');
+            expect(item).toHaveProperty('folder');
+            expect(item).toHaveProperty('label');
+        });
+
+        test('should include characters folder entries', () => {
+            const index = GenshinService.buildIndex();
+            const chars = index.filter(i => i.folder === 'characters');
+            expect(chars.length).toBeGreaterThan(0);
+        });
+
+        test('should be cached (second call returns same reference)', () => {
+            const a = GenshinService.buildIndex();
+            const b = GenshinService.buildIndex();
+            expect(a).toBe(b);
+        });
+    });
+
+    describe('fuzzySearch', () => {
+        test('should return empty for empty query', () => {
+            const result = GenshinService.fuzzySearch('');
+            expect(result.total).toBe(0);
+            expect(result.results).toEqual([]);
+        });
+
+        test('should find Zhongli by Chinese prefix', () => {
+            const result = GenshinService.fuzzySearch('钟', 10);
+            expect(result.total).toBeGreaterThan(0);
+            const zhongli = result.results.find(r => r.nameZh === '钟离' && r.folder === 'characters');
+            expect(zhongli).toBeDefined();
+        });
+
+        test('should find Staff of Homa by English substring', () => {
+            const result = GenshinService.fuzzySearch('homa', 10);
+            const homa = result.results.find(r => r.folder === 'weapons');
+            expect(homa).toBeDefined();
+        });
+
+        test('exact match should score 100', () => {
+            const result = GenshinService.fuzzySearch('amber', 10);
+            const exact = result.results.find(r => r.nameEn.toLowerCase() === 'amber' && r.folder === 'characters');
+            expect(exact).toBeDefined();
+            expect(exact.score).toBe(100);
+        });
+
+        test('should respect folder filter', () => {
+            const result = GenshinService.fuzzySearch('amber', 10, 'weapons');
+            expect(result.results.every(r => r.folder === 'weapons')).toBe(true);
+        });
+
+        test('should limit results', () => {
+            const result = GenshinService.fuzzySearch('a', 5);
+            expect(result.results.length).toBeLessThanOrEqual(5);
+        });
+
+        test('results should be sorted by score descending', () => {
+            const result = GenshinService.fuzzySearch('amber', 20);
+            for (let i = 1; i < result.results.length; i++) {
+                expect(result.results[i - 1].score).toBeGreaterThanOrEqual(result.results[i].score);
+            }
+        });
+    });
+
+    describe('resolveEnkaImage', () => {
+        test('should return Enka CDN URL for filename_icon', () => {
+            const url = GenshinService.resolveEnkaImage({ filename_icon: 'UI_AvatarIcon_Ambor' });
+            expect(url).toBe('https://enka.network/ui/UI_AvatarIcon_Ambor.png');
+        });
+
+        test('should return null when no filename fields', () => {
+            const url = GenshinService.resolveEnkaImage({ icon: 'http://example.com/x.png' });
+            expect(url).toBeNull();
+        });
+
+        test('should return null for null images', () => {
+            expect(GenshinService.resolveEnkaImage(null)).toBeNull();
+        });
+    });
+
+    describe('resolveImage', () => {
+        test('should prefer Enka CDN over remote URL', () => {
+            const url = GenshinService.resolveImage({
+                filename_icon: 'UI_AvatarIcon_Ambor',
+                mihoyo_icon: 'http://example.com/x.png'
+            });
+            expect(url).toBe('https://enka.network/ui/UI_AvatarIcon_Ambor.png');
+        });
+
+        test('should fall back to remote URL when no filename', () => {
+            const url = GenshinService.resolveImage({ mihoyo_icon: 'http://example.com/x.png' });
+            expect(url).toBe('http://example.com/x.png');
+        });
     });
 });

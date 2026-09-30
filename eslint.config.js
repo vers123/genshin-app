@@ -9,7 +9,7 @@ module.exports = [
                 ...globals.browser,
                 ...globals.jest
             },
-            ecmaVersion: 2021,
+            ecmaVersion: 2022,
             sourceType: 'script'
         },
         rules: {
