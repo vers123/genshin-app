@@ -9,11 +9,14 @@ class GenshinService {
     // ===== 预建搜索索引（中英双语，启动时一次性构建，之后 O(n) 模糊匹配） =====
     static _searchIndex = null;
 
+    // ===== 有数据的分类缓存（genshin-db 声明了函数但可能没有随包数据） =====
+    static _availableFolders = null;
+
     static buildIndex() {
         if (this._searchIndex) return this._searchIndex;
 
         const index = [];
-        for (const folder of config.folders) {
+        for (const folder of this.getFolders()) {
             if (typeof genshindb[folder] !== 'function') continue;
             try {
                 // 英文条目（含 id）
@@ -96,7 +99,10 @@ class GenshinService {
             : ['filename_gachaSplash', 'filename_gacha', 'filename_gachasplash',
                 'filename_icon', 'filename_awakenicon', 'filename_sideIcon'];
         for (const key of order) {
-            if (images[key]) return `${config.enkaCdn}${images[key]}.png`;
+            const name = images[key];
+            // 表情图标（UI_EmotionIcon*）未收录于 Enka CDN，避免拼出 404 链接
+            if (typeof name === 'string' && name.startsWith('UI_EmotionIcon')) continue;
+            if (name) return `${config.enkaCdn}${name}.png`;
         }
         return null;
     }
@@ -164,7 +170,7 @@ class GenshinService {
     static searchAll(query, resultLanguage) {
         const results = {};
         let hasResult = false;
-        for (const folder of config.folders) {
+        for (const folder of this.getFolders()) {
             const data = this.search(folder, query, resultLanguage);
             if (data) {
                 results[folder] = data;
@@ -177,19 +183,34 @@ class GenshinService {
     static getCount(folder) {
         if (folder === 'all') {
             let total = 0;
-            for (const f of config.folders) {
+            for (const f of this.getFolders()) {
                 const names = genshindb[f]('names', { matchCategories: true, queryLanguages: ['English'] });
                 if (Array.isArray(names)) total += names.length;
             }
             return total;
         }
-        if (typeof genshindb[folder] !== 'function') return null;
+        if (!this.getFolders().includes(folder)) return null;
         const names = genshindb[folder]('names', { matchCategories: true, queryLanguages: ['English'] });
         return Array.isArray(names) ? names.length : 0;
     }
 
     static getFolders() {
-        return config.folders.filter(folder => typeof genshindb[folder] === 'function');
+        if (this._availableFolders) return this._availableFolders;
+
+        this._availableFolders = config.folders.filter(folder => {
+            if (typeof genshindb[folder] !== 'function') return false;
+            try {
+                const names = genshindb[folder]('names', {
+                    matchCategories: true,
+                    queryLanguages: ['English']
+                });
+                return Array.isArray(names) && names.length > 0;
+            } catch (e) {
+                console.warn(`[folders] 跳过 ${folder}: ${e.message}`);
+                return false;
+            }
+        });
+        return this._availableFolders;
     }
 
     static listNames(folder, resultLanguage) {

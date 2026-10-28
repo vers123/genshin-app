@@ -31,7 +31,8 @@
         adventureranks:      { name: '冒险等阶',   icon: '\u{1F3AF}', group: '其他' },
         elements:            { name: '元素',       icon: '\u{1F300}', group: '其他' },
         crafts:              { name: '锻造',       icon: '\u{1F528}', group: '其他' },
-        rarity:              { name: '稀有度',     icon: '\u{1F451}', group: '其他' },
+        emojis:              { name: '表情',       icon: '\u{1F600}', group: '其他' },
+        voiceovers:          { name: '语音',       icon: '\u{1F3A4}', group: '其他' },
         talentmaterialtypes:  { name: '天赋材料类型', icon: '\u{1F4F0}', group: '其他' }
     };
 
@@ -237,6 +238,8 @@
         }
 
         let html = '';
+        const placeholderIcon = currentFolder === 'emojis' ? '\u{1F600}'
+            : currentFolder === 'voiceovers' ? '\u{1F3A4}' : '\u{1F4CB}';
         items.forEach(item => {
             const imgSrc = getItemImage(item);
             const name = item.name || '未知';
@@ -263,9 +266,9 @@
                         ${rarity ? `<span class="rarity-badge rarity-${rarity}">${rarity}\u2605</span>` : ''}
                         ${imgSrc
         ? `<img src="${imgSrc}" alt="${escapeHtml(name)}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling?this.nextElementSibling.style.display='':'';">`
-        : '<span class="item-placeholder">\u{1F4CB}</span>'
+        : `<span class="item-placeholder">${placeholderIcon}</span>`
     }
-                        ${imgSrc ? '<span class="item-placeholder" style="display:none;">\u{1F4CB}</span>' : ''}
+                        ${imgSrc ? `<span class="item-placeholder" style="display:none;">${placeholderIcon}</span>` : ''}
                     </div>
                     <div class="item-info">
                         <div class="item-name" title="${escapeHtml(name)}">${escapeHtml(name)}</div>
@@ -290,7 +293,9 @@
         if (!item.images) return null;
         const enkaOrder = ['filename_icon', 'filename_gachaSplash', 'filename_gacha', 'filename_awakenicon', 'filename_sideIcon'];
         for (const k of enkaOrder) {
-            if (item.images[k]) return ENKA_CDN + item.images[k] + '.png';
+            const name = item.images[k];
+            if (typeof name === 'string' && name.startsWith('UI_EmotionIcon')) continue;
+            if (name) return ENKA_CDN + name + '.png';
         }
         return item.images.mihoyo_icon
             || item.images.hoyowiki_icon

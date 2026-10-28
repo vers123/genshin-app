@@ -66,6 +66,9 @@ describe('API Routes', () => {
             expect(res.status).toBe(200);
             expect(Array.isArray(res.body.folders)).toBe(true);
             expect(res.body.folders.length).toBeGreaterThan(0);
+            expect(res.body.folders).toContain('emojis');
+            expect(res.body.folders).not.toContain('rarity');
+            expect(res.body.folders).not.toContain('tcgactioncards');
         });
     });
 

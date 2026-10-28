@@ -26,7 +26,8 @@
 - **自动补全** — 输入部分名称即可匹配（如输入 "amb" 自动匹配 "安柏"）
 - **实时数据** — 数据来源于 genshin-db npm 包，随版本更新
 - **响应式界面** — 适配桌面和移动端浏览器
-- **七圣召唤数据** — 包含七圣召唤卡牌相关数据分类
+- **七圣召唤数据** — 仅在 genshin-db 随包提供 TCG 数据时显示
+- **表情与语音** — 包含表情和角色语音数据分类
 
 ### 数据分类
 
@@ -41,8 +42,9 @@
 | materials | 材料 | namecards | 名片 |
 | windgliders | 风之翼 | adventureranks | 冒险等阶 |
 | elements | 元素 | crafts | 锻造 |
-| rarity | 稀有度 | tcgcharactercards | 七圣召唤角色卡 |
-| tcgactioncards | 七圣召唤行动卡 | tcgcardbacks | 七圣召唤卡背 |
+| emojis | 表情 | voiceovers | 语音 |
+
+> 七圣召唤与 `talentmaterialtypes` 分类需 genshin-db 提供数据；当前版本缺失时会自动隐藏。
 
 ### 快速开始
 
@@ -179,7 +181,8 @@ npm run dev
 - **Auto-completion** — Partial input matches automatically (e.g., typing "amb" matches "Amber")
 - **Up-to-date data** — Data sourced from the genshin-db npm package, updated with versions
 - **Responsive UI** — Adapts to both desktop and mobile browsers
-- **TCG data** — Includes Genius Invokation TCG card data categories
+- **TCG data** — Shown only when the genshin-db package ships TCG data
+- **Emojis & voiceovers** — Includes emoji and character voiceover data categories
 
 ### Data Categories
 
@@ -194,8 +197,9 @@ npm run dev
 | materials | Materials | namecards | Namecards |
 | windgliders | Windgliders | adventureranks | Adventure Ranks |
 | elements | Elements | crafts | Crafts |
-| rarity | Rarity | tcgcharactercards | TCG Character Cards |
-| tcgactioncards | TCG Action Cards | tcgcardbacks | TCG Card Backs |
+| emojis | Emojis | voiceovers | Voiceovers |
+
+> TCG and `talentmaterialtypes` categories require data from genshin-db; they are hidden automatically when missing.
 
 ### Quick Start
 

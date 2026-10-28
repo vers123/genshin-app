@@ -250,9 +250,9 @@ genshin-app/
 - **装备道具：** `weapons`, `artifacts`, `materials`
 - **世界探索：** `foods`, `domains`, `enemies`, `animals`, `geographies`
 - **收集成就：** `achievements`, `achievementgroups`, `namecards`, `windgliders`
-- **其他：** `adventureranks`, `elements`, `crafts`, `rarity`
-- **七圣召唤：** `tcgcharactercards`, `tcgactioncards`, `tcgcardbacks`, `tcgcardboxes`, `tcgkeywords`, `tcgsummons`, `tcgstatuseffects`, `tcgdetailedrules`, `tcglevelrewards`
-- **材料类型：** `talentmaterialtypes`
+- **其他：** `adventureranks`, `elements`, `crafts`, `emojis`, `voiceovers`
+- **七圣召唤：** `tcgcharactercards`, `tcgactioncards`, `tcgcardbacks`, `tcgcardboxes`, `tcgkeywords`, `tcgsummons`, `tcgstatuseffects`, `tcgdetailedrules`, `tcglevelrewards`（需 genshin-db 随包提供数据，缺失时自动隐藏）
+- **材料类型：** `talentmaterialtypes`（同上）
 
 ### 本地开发
 
@@ -627,9 +627,9 @@ The project supports the following genshin-db data categories:
 - **Equipment:** `weapons`, `artifacts`, `materials`
 - **World:** `foods`, `domains`, `enemies`, `animals`, `geographies`
 - **Collection:** `achievements`, `achievementgroups`, `namecards`, `windgliders`
-- **Other:** `adventureranks`, `elements`, `crafts`, `rarity`
-- **TCG:** `tcgcharactercards`, `tcgactioncards`, `tcgcardbacks`, `tcgcardboxes`, `tcgkeywords`, `tcgsummons`, `tcgstatuseffects`, `tcgdetailedrules`, `tcglevelrewards`
-- **Material Types:** `talentmaterialtypes`
+- **Other:** `adventureranks`, `elements`, `crafts`, `emojis`, `voiceovers`
+- **TCG:** `tcgcharactercards`, `tcgactioncards`, `tcgcardbacks`, `tcgcardboxes`, `tcgkeywords`, `tcgsummons`, `tcgstatuseffects`, `tcgdetailedrules`, `tcglevelrewards` (requires data shipped with genshin-db; hidden when missing)
+- **Material Types:** `talentmaterialtypes` (same as above)
 
 ### Local Development
 

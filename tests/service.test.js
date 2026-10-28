@@ -62,6 +62,19 @@ describe('GenshinService', () => {
             expect(folders.length).toBeGreaterThan(0);
             expect(folders).toContain('characters');
         });
+
+        test('should include newly available folders', () => {
+            const folders = GenshinService.getFolders();
+            expect(folders).toContain('emojis');
+            expect(folders).toContain('voiceovers');
+        });
+
+        test('should exclude folders without data or removed folders', () => {
+            const folders = GenshinService.getFolders();
+            expect(folders).not.toContain('rarity');
+            expect(folders).not.toContain('talentmaterialtypes');
+            expect(folders).not.toContain('tcgactioncards');
+        });
     });
 
     describe('listNames', () => {
@@ -274,6 +287,11 @@ describe('GenshinService', () => {
 
         test('should return null for null images', () => {
             expect(GenshinService.resolveEnkaImage(null)).toBeNull();
+        });
+
+        test('should skip emotion icons not hosted by Enka CDN', () => {
+            const url = GenshinService.resolveEnkaImage({ filename_icon: 'UI_EmotionIcon525' });
+            expect(url).toBeNull();
         });
     });
 
