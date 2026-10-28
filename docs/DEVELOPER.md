@@ -309,6 +309,21 @@ npm run test:coverage
 - `service.test.js` — GenshinService 单元测试
 - `api.test.js` — API 端点集成测试
 
+### 依赖安全
+
+```bash
+# 查看漏洞报告
+npm audit
+
+# 仅检查生产依赖
+npm audit --omit=dev
+
+# 修复可用补丁（不改变主版本）
+npm audit fix
+```
+
+当前已知例外：`deepmerge`（经 `jest → jest-config` 引入，仅开发依赖，`GHSA-gcqx-w48m-w2h4`，low）上游无已修复版本，`npm audit` 会建议降级 `jest` 到 25.x；该建议会破坏测试环境，**不要使用 `npm audit fix --force`**。
+
 ### 部署
 
 #### Docker 部署
@@ -685,6 +700,21 @@ npm run test:coverage
 Test files are in the `tests/` directory:
 - `service.test.js` — GenshinService unit tests
 - `api.test.js` — API endpoint integration tests
+
+### Dependency Security
+
+```bash
+# Show vulnerability report
+npm audit
+
+# Production dependencies only
+npm audit --omit=dev
+
+# Apply available patches (no major version changes)
+npm audit fix
+```
+
+Known exception: `deepmerge` (pulled in via `jest → jest-config`, dev-only, `GHSA-gcqx-w48m-w2h4`, low) has no patched upstream version. `npm audit` suggests downgrading `jest` to 25.x, which breaks the test setup — **do not run `npm audit fix --force`**.
 
 ### Deployment
 
